@@ -1,0 +1,5 @@
+---
+roles:
+  # Install a role from the Ansible Galaxy
+collections:
+  # Install collections from Ansible Galaxy

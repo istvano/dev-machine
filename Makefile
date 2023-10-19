@@ -9,6 +9,8 @@ export $(shell sed 's/=.*//' $(env))
 
 include help.mk
 include init.mk
+include vm.mk
+include provision.mk
 
 USERNAME=$(shell whoami)
 UID=$(shell id -u ${USERNAME})
@@ -16,12 +18,16 @@ GID=$(shell id -g ${USERNAME})
 
 MFILECWD = $(shell pwd)
 ETC=$(MFILECWD)/etc
+SHARE=$(MFILECWD)/share
+TLS=$(ETC)
 
 #space separated string array ->
 $(eval $(call defw,IP_ADDRESS,$(IP_ADDRESS)))
 $(eval $(call defw,ENV,$(ENV)))
 $(eval $(call defw,DOCKER,docker))
 $(eval $(call defw,CURL,curl))
+$(eval $(call defw,TART,tart))
+$(eval $(call defw,SSH,ssh))
 $(eval $(call defw,UNAME,$(UNAME_S)-$(UNAME_P)))
 
 ifeq ($(UNAME_S),Darwin)
