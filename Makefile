@@ -20,6 +20,7 @@ MFILECWD = $(shell pwd)
 ETC=$(MFILECWD)/etc
 SHARE=$(MFILECWD)/share
 TLS=$(ETC)
+PLYBK=$(MFILECWD)/playbook
 
 #space separated string array ->
 $(eval $(call defw,IP_ADDRESS,$(IP_ADDRESS)))

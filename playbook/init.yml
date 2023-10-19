@@ -1,0 +1,67 @@
+---
+- hosts: all
+
+  pre_tasks:
+
+    - name: Create APT keyrings dir
+      become: true
+      ansible.builtin.file:
+        path: '/etc/apt/keyrings'
+        state: directory
+        mode: 'u=rwx,go=rx'
+
+    - name: Add Google Linux key
+      become: true
+      ansible.builtin.get_url:
+        url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+        dest: '/etc/apt/keyrings/linux.google.asc'
+        mode: 'u=rw,go=r'
+        force: true
+      tags:
+        - gui
+        - chrome
+
+    - name: Add Google Chrome repo
+      become: true
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/linux.google.asc]
+          https://dl.google.com/linux/chrome/deb/ stable main
+        filename: google-chrome
+        update_cache: no
+      tags:
+        - gui
+        - chrome
+      register: chrome_repo
+
+    - name: Add vscode key
+      become: true
+      ansible.builtin.get_url:
+        url: 'https://packages.microsoft.com/keys/microsoft.asc'
+        dest: '/etc/apt/keyrings/'
+        mode: 'u=rw,go=r'
+        force: true
+      tags:
+        - gui
+        - vscode
+
+    - name: Add vscode repo
+      become: true
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.asc]
+          https://packages.microsoft.com/repos/code stable main
+        filename: vscode
+        update_cache: no
+      tags:
+        - gui
+        - vscode
+      register: vscode_repo
+
+    - name: Run apt-get update
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+      when: >        
+        (chrome_repo is defined and chrome_repo.changed)
+        or (vscode_repo is defined and vscode_repo.changed)

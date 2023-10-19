@@ -17,3 +17,8 @@ vm/tart/ssh:  ##@vm SSH into the VM
 vm/tart/mount:  ##@vm Mount volume
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
 	$(SSH) $(VM_USER)@$$VM_IP sudo mount -t virtiofs com.apple.virtio-fs.automount /mnt
+
+.PHONY: vm/tart/inventory
+vm/tart/inventory:  ##@vm Create inventory file for tart
+	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
+	sed -e "s/--ip--/$$VM_IP/g" -e "s/--user--/$(VM_USER)/g" $(PLYBK)/inventory.tmpl > $(PLYBK)/inventory
