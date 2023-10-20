@@ -7,10 +7,11 @@ env ?= .env
 include $(env)
 export $(shell sed 's/=.*//' $(env))
 
-include help.mk
-include init.mk
-include vm.mk
-include provision.mk
+include ./scripts/help.mk
+include ./scripts/init.mk
+include ./scripts/vm.mk
+include ./scripts/provision.mk
+include ./scripts/sec.mk
 
 USERNAME=$(shell whoami)
 UID=$(shell id -u ${USERNAME})
@@ -21,6 +22,7 @@ ETC=$(MFILECWD)/etc
 SHARE=$(MFILECWD)/share
 TLS=$(ETC)
 PLYBK=$(MFILECWD)/playbook
+DEV_KEY=$(TLS)/id_rsa_dev
 
 #space separated string array ->
 $(eval $(call defw,IP_ADDRESS,$(IP_ADDRESS)))
@@ -29,6 +31,9 @@ $(eval $(call defw,DOCKER,docker))
 $(eval $(call defw,CURL,curl))
 $(eval $(call defw,TART,tart))
 $(eval $(call defw,SSH,ssh))
+$(eval $(call defw,SCP,scp))
+$(eval $(call defw,SED,sed))
+$(eval $(call defw,OPENSSL,openssl))
 $(eval $(call defw,UNAME,$(UNAME_S)-$(UNAME_P)))
 
 ifeq ($(UNAME_S),Darwin)
