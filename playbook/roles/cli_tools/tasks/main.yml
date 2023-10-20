@@ -1,0 +1,34 @@
+---
+- name: install common command line tools
+  become: yes
+  apt:
+    name:
+      - bat
+      - btop
+      - curl
+      - dos2unix
+      - duf
+      - fd-find
+      - fzf
+      - git-absorb
+      - git-extras
+      - glances
+      - graphviz
+      - grc
+      - hexyl
+      - htop
+      - httpie
+      - hyperfine
+      - jq
+      - lnav
+      - mtr
+      - multitail
+      - ripgrep
+      - shellcheck
+      - shfmt
+      - ssh-tools
+      - tree
+      - vim-airline
+      - wget
+      - zoxide
+    state: present

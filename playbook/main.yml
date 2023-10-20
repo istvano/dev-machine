@@ -1,0 +1,486 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    intellij_edition: community
+    my_user: admin
+    persistent_home: /mnt/share
+    kb_model: pc105 
+    kb_layout: gb
+    locale: en_GB.UTF-8
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt: update_cache=true cache_valid_time=86400
+
+    - name: Update all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
+
+    # zram shouldn't be used with Zswap
+    - name: Ensure zram-config absent
+      ansible.builtin.apt:
+        name: zram-config
+        state: absent
+
+  roles:
+
+    # Set system timezone
+    - role: gantsign.timezone
+      timezone: Europe/London
+
+    # Increase the number of files that can be watched.
+    # https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
+    - role: gantsign.inotify
+      inotify_max_user_watches: 524288
+
+    # Set keyboard layout
+    - role: gantsign.keyboard
+      keyboard_model: '{{ kb_model }}'
+      keyboard_layout: '{{ kb_layout }}'
+
+    # Configure locale
+    - role: oefenweb.locales
+      locales_present:
+        - en_GB.UTF-8
+        - en_US.UTF-8
+      locales_default:
+        lang: '{{ locale }}'
+
+    # Install common command line tools
+    - role: cli_tools
+
+    # Configure Git version control
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        core.autocrlf: input # Force Linux line endings
+        diff.algorithm: histogram # For improved diff
+        diff.indentHeuristic: 'true' # For improved diff
+        diff.mnemonicPrefix: 'true' # For more readable diff
+        difftool.prompt: 'false' # Suppress annoying prompt launching difftool
+        init.defaultBranch: main
+        log.date: 'format:%a %Y-%m-%d %H:%M:%S %z' # Use ISO format
+        mergetool.prompt: 'false' # Suppress annoying prompt launching mergetool
+        push.autoSetupRemote: 'true' # So you can pull the branch later
+        push.default: simple # Use same branch names for local and remote
+        rerere.autoUpdate: 'true' # Avoid having to redo a merge
+        rerere.enabled: 'true' # Avoid having to redo a merge
+        user.useConfigOnly: 'true' # Don't guess username / email
+
+        # utility aliases
+        alias.rhead: >-
+          !git remote show origin | grep -Po 'HEAD branch: \K.*'
+        alias.root: 'rev-parse --show-toplevel'
+        alias.lb: >-
+          !git reflog show --pretty=format:'%gs ~ %gd' --date=relative
+          | grep 'checkout:'
+          | grep -oE '[^ ]+ ~ .*'
+          | awk -F~ '!seen[$1]++'
+          | head -n 10
+          | awk -F' ~ HEAD@{' '{printf("  \033[33m%s: \033[37m %s\033[0m\n", substr($2, 1, length($2)-1), $1)}'
+        alias.exec: '!f() { exec "$@"; }; f'
+        # log output
+        alias.lds: 'log --pretty=format:"%C(yellow)%h\ %ad%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate --date=short'
+        alias.ll: 'log --pretty=format:"%C(yellow)%h%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate --numstat'
+        alias.ls: 'log --pretty=format:"%C(yellow)%h%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate'
+        alias.lt: 'log --oneline --graph --decorate --all'
+        alias.release-notes: >-
+          !git log --color --pretty=format:'%s%Cred%d%Creset' --decorate | sed -E 's/(.*) \((\#[0-9]+)\)/* \2: \1/' | tac -
+        # switching branch
+        alias.sw: 'switch'
+        alias.cb: 'switch -c'
+        alias.sdp: '!git switch $(git dev) && git pull -p'
+        alias.shp: '!git fetch -p && git switch $(git rhead) && git pull -p'
+        alias.smp: '!git switch $(git main) && git pull -p'
+        # amending commits
+        alias.ca: 'commit --amend'
+        alias.cane: 'commit --amend --no-edit'
+        # pushing
+        alias.po: 'push origin HEAD'
+        alias.pof: 'push origin HEAD --force'
+        # rebasing
+        alias.rod: '!git fetch -p && git rebase origin/$(git dev)'
+        alias.roh: '!git fetch -p && git rebase origin/$(git rhead)'
+        alias.rom: '!git fetch -p && git rebase origin/$(git main)'
+        # other
+        alias.pop: 'stash pop'
+
+    # Configure Git version control for Meld
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        difftool.meld.cmd: 'meld "$LOCAL" "$REMOTE"'
+        merge.tool: meld
+        mergetool.meld.cmd: 'meld "$LOCAL" "$MERGED" "$REMOTE"'
+      tags:
+        - gui
+
+    # Configure Git version control for VS Code
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        difftool.code.cmd: 'code --reuse-window --wait --diff "$LOCAL" "$REMOTE"'
+        mergetool.code.cmd: 'code --reuse-window --wait "$MERGED"'
+      tags:
+        - gui
+        - vscode
+
+    # Configure Git version control for IntelliJ
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        difftool.idea.cmd: 'idea diff "$LOCAL" "$REMOTE"'
+        mergetool.idea.cmd: 'idea merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"'
+      tags:
+        - gui
+        - intellij
+
+    # Configure Git user name and email
+    - role: gantsign.git_user
+      users:
+        - username: '{{ my_user }}'
+          git_user_name: '{{ git_user_name | default(None) }}'
+          git_user_email: '{{ git_user_email | default(None) }}'
+          git_user_force: '{{ git_user_force | default(False) }}'
+
+    # Install Docker
+    - role: geerlingguy.docker
+      tags:
+        - docker
+      docker_users:
+        - '{{ my_user }}'
+
+# Install Pyenv
+    - role: gantsign.pyenv
+      tags:
+        - python
+      pyenv_users:
+        - '{{ my_user }}'
+
+    # Install Pipenv
+    - role: pipenv
+      become: yes
+      become_user: '{{ my_user }}'
+      tags:
+        - python
+
+    # Install Java JDK 11
+    - role: gantsign.java
+      tags:
+        - java
+      java_version: '11.0.20.1+1'
+      java_is_default_installation: no
+      java_fact_group_name: java_11
+
+    # Install Java JDK 17
+    - role: gantsign.java
+      tags:
+        - java
+      java_version: '17.0.8.1+1'
+
+    # Install Maven
+    - role: gantsign.maven
+      tags:
+        - java
+        - maven
+      maven_version: '3.9.4'
+
+    # Add Node.js
+    - role: geerlingguy.nodejs
+      tags:
+        - nodejs
+      nodejs_version: 18.x
+      nodejs_install_npm_user: '{{ my_user }}'
+      nodejs_npm_global_packages:
+        - name: grunt-cli
+        - name: grunt-init
+        - name: gulp-cli
+        - name: npm-check-updates
+        - name: typescript
+        - name: ts-node
+        - name: typings
+
+    # Install GNOME desktop
+    - role: gantsign.xdesktop
+      tags:
+        - gui
+
+    # Disable guest login
+    - role: gantsign.lightdm
+      tags:
+        - gui
+
+    # Set the default web browser
+    # This is only a partial solution as Google Chrome will still ask if you
+    # want to make it the default browser when it first runs.
+    - role: gantsign.default-web-browser
+      tags:
+        - gui
+        - chrome
+      default_web_browser: google-chrome
+
+    # Install Postman HTTP tool
+    - role: postman
+      tags:
+        - gui
+        - postman
+
+    # Install Visual Studio Code editor
+    - role: gantsign.visual-studio-code
+      tags:
+        - gui
+        - vscode
+      users:
+        - username: '{{ my_user }}'
+          visual_studio_code_extensions:
+            - donjayamanne.githistory
+            - EditorConfig.EditorConfig
+            - foxundermoon.shell-format
+            - github.vscode-github-actions
+            - ldez.ignore-files
+            - oderwat.indent-rainbow
+            - streetsidesoftware.code-spell-checker
+            - timonwong.shellcheck
+            - rebornix.Ruby
+          visual_studio_code_settings: {
+            "editor.rulers": [80, 100, 120],
+            "editor.renderWhitespace": true,
+            "files.associations": {
+              "Vagrantfile": "ruby",
+              ".vagrantuser": "yaml",
+              ".vagrantuser.example": "yaml"
+            },
+            "editor.fontFamily": "JetBrainsMono Nerd Font, Noto Color Emoji, 'Droid Sans Mono', 'monospace', monospace"
+          }
+
+    # Install Python extension for Visual Studio Code editor
+    - role: gantsign.visual-studio-code-extensions
+      tags:
+        - gui
+        - vscode
+        - python
+      users:
+        - username: '{{ my_user }}'
+          visual_studio_code_extensions:
+            - ms-python.python
+            - ms-python.isort
+            - redhat.ansible
+            - wholroyd.jinja
+
+    # Install Visual Studio Code editor extensions relating to Docker
+    - role: gantsign.visual-studio-code-extensions
+      tags:
+        - gui
+        - vscode
+        - docker
+      users:
+        - username: '{{ my_user }}'
+          visual_studio_code_extensions:
+            - ms-azuretools.vscode-docker
+            - ms-vscode-remote.remote-containers
+
+    # Install and configure IntelliJ IDEA IDE
+    - role: gantsign.intellij
+      tags:
+        - gui
+        - intellij
+      intellij_install_user: '{{ my_user }}'
+      intellij_install_dir: '/opt/idea/idea-{{ intellij_edition }}'
+      users:
+        - username: '{{ my_user }}'
+          intellij_disabled_plugins:
+            - CVS
+            - com.intellij.uiDesigner
+            - org.jetbrains.android
+            - TestNG-J
+            - hg4idea
+            - Subversion
+            - AntSupport
+            - DevKit
+            - CFML Support
+            - ClearcasePlugin
+            - CloudBees
+            - CloudFoundry
+            - Geronimo
+            - GlassFish
+            - Heroku
+            - J2ME
+            - JBoss
+            - JSR45Plugin
+            - OpenShift
+            - Resin
+            - StrutsAssistant
+            - WebSphere
+            - Weblogic
+            - com.intellij.appengine
+            - com.intellij.aspectj
+            - com.intellij.dmserver
+            - com.intellij.drools
+            - com.intellij.flex
+            - com.intellij.gwt
+            - com.intellij.javaee.view
+            - com.intellij.jbpm
+            - com.intellij.play
+            - com.intellij.seam
+            - com.intellij.seam.pageflow
+            - com.intellij.seam.pages
+            - com.intellij.struts2
+            - com.intellij.tapestry
+            - com.intellij.vaadin
+            - com.intellij.velocity
+            - org.coffeescript
+            - org.intellij.grails
+            - org.jetbrains.plugins.haml
+            - org.jetbrains.plugins.javaFX
+            - org.jetbrains.plugins.stylus
+            - TFS
+            - PerforceDirectPlugin
+          intellij_codestyles:
+            - name: GantSign
+              url: 'https://raw.githubusercontent.com/gantsign/code-style-intellij/2.0.0/GantSign.xml'
+            - name: GantSign2
+              url: 'https://raw.githubusercontent.com/gantsign/code-style-intellij/2.0.0/GantSign2.xml'
+          intellij_active_codestyle: GantSign2
+          intellij_inspection_profiles:
+            - name: GantSign
+              url: 'https://raw.githubusercontent.com/gantsign/inspection-profile-intellij/1.0.0/GantSign.xml'
+          intellij_default_inspection_profile: GantSign
+          intellij_plugins:
+            # Rainbow colored indenting
+            - indent-rainbow.indent-rainbow
+            # Rainbow colored brackets
+            - izhangzhihao.rainbow.brackets
+            # Save Actions plugin
+            - software.xdev.saveactions
+            # Transform strings
+            - 'String Manipulation'
+            # For drawing diagrams
+            - 'PlantUML integration'
+          intellij_license_key_path: '{{ intellij_license_key_path }}'
+
+    # Configure JDKs in IntelliJ IDEA IDE
+    - role: gantsign.intellij_jdks
+      tags:
+        - java
+        - gui
+        - intellij
+      users:
+        - username: '{{ my_user }}'
+          intellij_jdks:
+            - name: '11'
+              home: "{{ ansible_local.java_11.general.home }}"
+            - name: '17'
+              home: "{{ ansible_local.java.general.home }}"
+          intellij_jdks_default: '17'
+
+    # Set IntelliJ Editor Font
+    - role: intellij_font
+
+    # Install Java related plugins for IntelliJ IDEA IDE
+    - role: gantsign.intellij-plugins
+      tags:
+        - java
+        - gui
+        - intellij
+      users:
+        - username: '{{ my_user }}'
+          intellij_plugins:
+            - CheckStyle-IDEA
+            - MavenRunHelper
+            - LogSupport2
+            - de.platon42.cajon
+
+    # Install Python plugin for IntelliJ IDEA IDE
+    - role: gantsign.intellij-plugins
+      tags:
+        - gui
+        - intellij
+        - python
+      users:
+        - username: '{{ my_user }}'
+          intellij_plugins:
+            - "{{ (intellij_edition == 'community') | ternary('PythonCore', 'Pythonid') }}"
+
+
+    # Configure general environment variables
+    - role: weareinteractive.environment
+      environment_config:
+        CDPATH: ".:/home/{{ my_user }}/workspace"
+        TREE_COLORS: ':no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.bat=01;32:*.BAT=01;32:*.btm=01;32:*.BTM=01;32:*.cmd=01;32:*.CMD=01;32:*.com=01;32:*.COM=01;32:*.dll=01;32:*.DLL=01;32:*.exe=01;32:*.EXE=01;32:*.arj=01;31:*.bz2=01;31:*.deb=01;31:*.gz=01;31:*.lzh=01;31:*.rpm=01;31:*.tar=01;31:*.taz=01;31:*.tb2=01;31:*.tbz2=01;31:*.tbz=01;31:*.tgz=01;31:*.tz2=01;31:*.z=01;31:*.Z=01;31:*.zip=01;31:*.ZIP=01;31:*.zoo=01;31:*.asf=01;35:*.ASF=01;35:*.avi=01;35:*.AVI=01;35:*.bmp=01;35:*.BMP=01;35:*.flac=01;35:*.FLAC=01;35:*.gif=01;35:*.GIF=01;35:*.jpg=01;35:*.JPG=01;35:*.jpeg=01;35:*.JPEG=01;35:*.m2a=01;35:*.M2a=01;35:*.m2v=01;35:*.M2V=01;35:*.mov=01;35:*.MOV=01;35:*.mp3=01;35:*.MP3=01;35:*.mpeg=01;35:*.MPEG=01;35:*.mpg=01;35:*.MPG=01;35:*.ogg=01;35:*.OGG=01;35:*.ppm=01;35:*.rm=01;35:*.RM=01;35:*.tga=01;35:*.TGA=01;35:*.tif=01;35:*.TIF=01;35:*.wav=01;35:*.WAV=01;35:*.wmv=01;35:*.WMV=01;35:*.xbm=01;35:*.xpm=01;35:'
+
+    # Configure Java environment variables
+    - role: weareinteractive.environment
+      tags:
+        - java
+      environment_config:
+        JAVA_HOME: "{{ ansible_local.java.general.home }}"
+
+    # Configure Maven environment variable
+    - role: weareinteractive.environment
+      tags:
+        - java
+        - maven
+      environment_config:
+        M2_HOME: "{{ ansible_local.maven.general.home }}"
+        # -XX:TieredStopAtLevel=1 disables hotspot profiling and higher tiers of
+        # optimization, which Maven builds are too short lived to benefit from.
+        MAVEN_OPTS: '-XX:TieredStopAtLevel=1'
+        # Affects the Gradle client not the Gradle server
+        GRADLE_OPTS: '-Xmx64m -XX:TieredStopAtLevel=1'
+
+    # Configure Zsh
+    - role: zsh
+      become: yes
+      become_user: '{{ my_user }}'
+      tags:
+        - oh-my-zsh
+
+    # Install SDKMAN software development kit manager
+    - role: gantsign.sdkman
+      tags:
+        - sdkman
+      sdkman_users:
+        - '{{ my_user }}'
+
+    # Add SDKs to SDKMAN
+    - role: gantsign.sdkman_init
+      tags:
+        - sdkman
+        - java
+      users:
+        - username: '{{ my_user }}'
+          sdkman_install:
+            - candidate: java
+              version: '11'
+              path: '{{ ansible_local.java_11.general.home }}'
+            - candidate: java
+              version: '17'
+              path: '{{ ansible_local.java.general.home }}'
+          sdkman_default:
+            java: '17'
+
+    - role: gantsign.sdkman_init
+      tags:
+        - sdkman
+        - java
+        - maven
+      users:
+        - username: '{{ my_user }}'
+          sdkman_install:
+            - candidate: maven
+              version: '3.9'
+              path: '{{ ansible_local.maven.general.home }}'
+          sdkman_default:
+            maven: '3.9'
+
+  post_tasks:
+    # Cleanup
+    - name: Remove dependencies that are no longer required
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Remove obsolete packages from the cache
+      ansible.builtin.apt:
+        autoclean: true
