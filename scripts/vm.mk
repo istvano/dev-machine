@@ -18,6 +18,11 @@ vm/tart/mount:  ##@vm Mount volume
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
 	$(SSH) $(VM_USER)@$$VM_IP sudo mount -t virtiofs com.apple.virtio-fs.automount /mnt
 
+.PHONY: vm/tart/automount
+vm/tart/automount:  ##@vm Automount volume
+	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
+	$(SSH) -i $(DEV_KEY) $(VM_USER)@$$VM_IP sh -c "echo 'mount -t virtiofs com.apple.virtio-fs.automount /mnt' | sudo tee /etc/rc.local"
+
 .PHONY: vm/tart/inventory
 vm/tart/inventory:  ##@vm Create inventory file for tart
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \

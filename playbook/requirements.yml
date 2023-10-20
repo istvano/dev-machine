@@ -38,5 +38,3 @@
   version: 'v3.0.1'
 - src: https://github.com/gantsign/ansible-role-xdesktop/archive/6.1.1.tar.gz
   name: gantsign.xdesktop
-- src: gantsign.default-web-browser
-  version: '4.0.0'

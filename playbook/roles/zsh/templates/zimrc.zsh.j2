@@ -64,21 +64,6 @@ fi
 if (( $+commands[fzf] )); then
     zmodule ohmyzsh/ohmyzsh --root plugins -s 'fzf/fzf.plugin.zsh'
 fi
-if (( $+commands[kubectl] )); then
-    zmodule ohmyzsh/ohmyzsh --root plugins -s 'kubectl/kubectl.plugin.zsh'
-fi
-if (( $+commands[kubeadm] )); then
-    zmodule gantsign/zsh-plugins -s 'kubeadm/kubeadm.plugin.zsh'
-fi
-if (( $+commands[minikube] )); then
-    zmodule gantsign/zsh-plugins -s 'minikube-none/minikube.plugin.zsh'
-fi
-if (( $+commands[helm] )); then
-    zmodule ohmyzsh/ohmyzsh --root plugins -s 'helm/helm.plugin.zsh'
-fi
-if (( $+commands[kompose] )); then
-    zmodule gantsign/zsh-plugins -s 'kompose/kompose.plugin.zsh'
-fi
 if (( $+commands[npm] )); then
     zmodule ohmyzsh/ohmyzsh --root plugins -s 'npm/npm.plugin.zsh'
 fi

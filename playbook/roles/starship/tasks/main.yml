@@ -1,0 +1,6 @@
+---
+- name: Install Postman
+  ansible.builtin.snap:
+    name: starship
+    channel: latest/edge
+    state: present

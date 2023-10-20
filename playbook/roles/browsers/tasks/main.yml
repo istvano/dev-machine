@@ -1,0 +1,8 @@
+---
+- name: install Chromium
+  become: yes
+  apt:
+    name:
+      - chromium-browser
+      - firefox
+    state: present

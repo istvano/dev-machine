@@ -212,20 +212,17 @@
       tags:
         - gui
 
-    # Set the default web browser
-    # This is only a partial solution as Google Chrome will still ask if you
-    # want to make it the default browser when it first runs.
-    - role: gantsign.default-web-browser
-      tags:
-        - gui
-        - chrome
-      default_web_browser: google-chrome
-
     # Install Postman HTTP tool
     - role: postman
       tags:
         - gui
         - postman
+
+    # Install Browser
+    - role: browsers
+      tags:
+        - gui
+        - browser
 
     # Install Visual Studio Code editor
     - role: gantsign.visual-studio-code
@@ -244,6 +241,15 @@
             - streetsidesoftware.code-spell-checker
             - timonwong.shellcheck
             - rebornix.Ruby
+            - mdickin.markdown-shortcuts
+            - davidanson.vscode-markdownlint
+            - vscode-icons-team.vscode-icons
+            - ms-vscode-remote.remote-containers
+            - eamodio.gitlens
+            - ms-cst-e.vscode-devskim
+            - ms-kubernetes-tools.vscode-kubernetes-tools
+            - ms-azuretools.vscode-docker
+            - humao.rest-client
           visual_studio_code_settings: {
             "editor.rulers": [80, 100, 120],
             "editor.renderWhitespace": true,
@@ -252,7 +258,36 @@
               ".vagrantuser": "yaml",
               ".vagrantuser.example": "yaml"
             },
-            "editor.fontFamily": "JetBrainsMono Nerd Font, Noto Color Emoji, 'Droid Sans Mono', 'monospace', monospace"
+            "editor.fontFamily": "'Fira Code',Consolas, 'Courier New', JetBrainsMono Nerd Font, Noto Color Emoji, 'Droid Sans Mono', 'monospace', monospace",
+            "editor.fontLigatures": true,
+            "editor.fontSize": 16,
+            "editor.fontWeight": "400",
+            "editor.bracketPairColorization.enabled": true,
+            "editor.guides.bracketPairs":"active",
+            "window.zoomLevel": 0.5,
+            "workbench.colorTheme": "Solarized Light",
+            "workbench.colorCustomizations": {
+                "terminal.ansiBlack": "#000000",
+                "terminal.ansiBlue": "#0451a5",
+                "terminal.ansiBrightBlack": "#666666",
+                "terminal.ansiBrightBlue": "#0451a5",
+                "terminal.ansiBrightCyan": "#0598bc",
+                "terminal.ansiBrightGreen": "#14ce14",
+                "terminal.ansiBrightMagenta": "#bc05bc",
+                "terminal.ansiBrightRed": "#cd3131",
+                "terminal.ansiBrightWhite": "#a5a5a5",
+                "terminal.ansiBrightYellow": "#b5ba00",
+                "terminal.ansiCyan": "#0598bc",
+                "terminal.ansiGreen": "#00bc00",
+                "terminal.ansiMagenta": "#bc05bc",
+                "terminal.ansiRed": "#cd3131",
+                "terminal.ansiWhite": "#555555",
+                "terminal.ansiYellow": "#949800",
+                "terminal.border": "#80808059",
+                "terminal.foreground": "#333333",
+                "terminal.background": "#fdf6e3"
+            },
+            "explorer.confirmDelete": false
           }
 
     # Install Python extension for Visual Studio Code editor
@@ -436,6 +471,11 @@
       become_user: '{{ my_user }}'
       tags:
         - oh-my-zsh
+
+    - role: starship
+      tags:
+        - oh-my-zsh
+        - gui
 
     # Install SDKMAN software development kit manager
     - role: gantsign.sdkman
