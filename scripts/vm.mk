@@ -3,6 +3,10 @@ vm/tart/clone:  ##@vm Clone Tart VM using tart
 	@echo "Cleanup completed"
 	$(TART) clone $(TART_VM) $(TART_VM_NAME)
 
+.PHONY: vm/tart/set
+vm/tart/set:  ##@vm Set cpu / mem  for VM
+	$(TART) set $(TART_VM_NAME) --memory=8192 --cpu=6
+
 .PHONY: vm/tart/start
 vm/tart/start:  ##@vm Start Tart VM using tart
 	@echo "Starting vm using Tart..."
@@ -21,7 +25,9 @@ vm/tart/mount:  ##@vm Mount volume
 .PHONY: vm/tart/automount
 vm/tart/automount:  ##@vm Automount volume
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
-	$(SSH) -i $(DEV_KEY) $(VM_USER)@$$VM_IP sh -c "echo 'mount -t virtiofs com.apple.virtio-fs.automount /mnt' | sudo tee /etc/rc.local"
+	printf '%s\n' '#!/bin/sh' 'mount -t virtiofs com.apple.virtio-fs.automount /mnt' 'exit 0'  | $(SSH) -i $(DEV_KEY) $(VM_USER)@$$VM_IP sudo -u root tee /etc/rc.local; \
+	$(SSH) -i $(DEV_KEY) $(VM_USER)@$$VM_IP sudo -u root chmod +x /etc/rc.local;
+
 
 .PHONY: vm/tart/inventory
 vm/tart/inventory:  ##@vm Create inventory file for tart
