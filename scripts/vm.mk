@@ -1,16 +1,25 @@
 .PHONY: vm/tart/clone
-vm/tart/clone:  ##@vm Clone Tart VM using tart
-	@echo "Cleanup completed"
+vm/tart/clone:  ##@vm Clone Tart VM using tart	
 	$(TART) clone $(TART_VM) $(TART_VM_NAME)
+	@echo "Clone completed..."
 
 .PHONY: vm/tart/set
-vm/tart/set:  ##@vm Set cpu / mem  for VM
-	$(TART) set $(TART_VM_NAME) --memory=8192 --cpu=6
+vm/tart/set:  ##@vm Set cpu / mem  for VM	
+	$(TART) set $(TART_VM_NAME) --memory=$(VM_MEM) --cpu=$(VM_CPU)
+	@echo "Tart vm config set up..."
+
+.PHONY: vm/tart/init
+vm/tart/init:  vm/tart/clone vm/tart/set ##@vm Clone and set vm settings
 
 .PHONY: vm/tart/start
 vm/tart/start:  ##@vm Start Tart VM using tart
 	@echo "Starting vm using Tart..."
 	$(TART) run --dir=shared:$(SHARE) $(TART_VM_NAME)
+
+.PHONY: vm/tart/delete
+vm/tart/delete:  ##@vm Delete Tart VM
+	@echo "deleting vm using Tart..."
+	$(TART) delete $(TART_VM_NAME)
 
 .PHONY: vm/tart/ssh
 vm/tart/ssh:  ##@vm SSH into the VM, you need to install public key

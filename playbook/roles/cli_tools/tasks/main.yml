@@ -31,4 +31,5 @@
       - vim-airline
       - wget
       - zoxide
+      - ctop
     state: present

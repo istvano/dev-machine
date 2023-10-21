@@ -40,3 +40,9 @@
     src: zshrc.zsh
     dest: ~/.zshrc
     mode: 'u=rw,go='
+
+- name: Prezto checkout
+  ansible.builtin.git:
+    repo: 'https://github.com/sorin-ionescu/prezto.git'
+    dest: ~/.zprezto
+    recursive: true
