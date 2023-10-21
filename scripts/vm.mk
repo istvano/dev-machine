@@ -1,15 +1,15 @@
+.PHONY: vm/tart/init
+vm/tart/init:  vm/tart/clone vm/tart/set ##@vm Clone and set vm settings
+
 .PHONY: vm/tart/clone
-vm/tart/clone:  ##@vm Clone Tart VM using tart	
+vm/tart/clone: ##@vm Clone ubuntu
 	$(TART) clone $(TART_VM) $(TART_VM_NAME)
 	@echo "Clone completed..."
 
 .PHONY: vm/tart/set
-vm/tart/set:  ##@vm Set cpu / mem  for VM	
+vm/tart/set: ##@vm Configure vm settings
 	$(TART) set $(TART_VM_NAME) --memory=$(VM_MEM) --cpu=$(VM_CPU)
 	@echo "Tart vm config set up..."
-
-.PHONY: vm/tart/init
-vm/tart/init:  vm/tart/clone vm/tart/set ##@vm Clone and set vm settings
 
 .PHONY: vm/tart/start
 vm/tart/start:  ##@vm Start Tart VM using tart
