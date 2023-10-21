@@ -37,5 +37,5 @@ vm/tart/inventory:  ##@vm Create inventory file for tart
 .PHONY: vm/tart/install-public-key
 vm/tart/install-public-key:  ##@vm Install public key
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
-	$(SSH) $(VM_USER)@$$VM_IP sh -c "'cat >> .ssh/authorized_keys'" < $(DEV_KEY).pub	
+	$(SSH) -o PubkeyAuthentication=no -o PreferredAuthentications=password $(VM_USER)@$$VM_IP sh -c "'cat >> .ssh/authorized_keys'" < $(DEV_KEY).pub
 
