@@ -11,6 +11,7 @@ Execute `make` to get a list of command you can do
 
 ### Init
 
+* `make dev-key/create` will create a developer x.509 key pair for ssh access
 * `make vm/tart/clone` will create an ubuntu vm
 * `make vm/tart/set` will change the vm settings using .env cpu and mem values
 * `make vm/tart/start` will start the vitual machine
@@ -19,8 +20,8 @@ Wait for the machine to boot up
 
 ### Provision
 
-* `make dev-key/create` will create a developer x.509 key pair for ssh access
 * `make vm/tart/install-public-key` will install the dev key onto the vm to easy ssh access
+* `make vm/tart/inventory` will create an ansible inventory file using the VM's ip
 * `make pro/install-reqs` will install ansible requirements
 * `make pro/init` set up required keys and repositories
 * `make pro/run` will run ansible and provision the vm 
