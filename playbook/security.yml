@@ -1,0 +1,37 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    intellij_edition: community
+    my_user: admin
+    kb_model: pc105 
+    kb_layout: gb
+    locale: en_GB.UTF-8
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt: update_cache=true cache_valid_time=86400
+
+    - name: Update all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
+
+  roles:
+
+    # Install security
+    - role: security
+      tags:
+        - gui
+        - security
+
+
+  post_tasks:
+    # Cleanup
+    - name: Remove dependencies that are no longer required
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Remove obsolete packages from the cache
+      ansible.builtin.apt:
+        autoclean: true

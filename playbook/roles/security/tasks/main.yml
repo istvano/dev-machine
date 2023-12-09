@@ -1,0 +1,24 @@
+---
+- name: Install UFW firewall
+  apt: name=ufw update_cache=yes state=latest  
+  
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+
+- name: Allow all access to tcp port 80
+  ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+
+- name: Allow all access to tcp port 443
+  ufw:
+    rule: allow
+    port: 443
+    proto: tcp
+
+- name: Allow ssh
+  ufw:
+    rule: allow
+    port: ssh    

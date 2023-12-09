@@ -5,7 +5,6 @@
   vars:
     intellij_edition: community
     my_user: admin
-    persistent_home: /mnt/share
     kb_model: pc105 
     kb_layout: gb
     locale: en_GB.UTF-8
