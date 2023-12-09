@@ -1,0 +1,64 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    intellij_edition: community
+    my_user: admin
+    persistent_home: /mnt/share
+    kb_model: pc105 
+    kb_layout: gb
+    locale: en_GB.UTF-8
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt: update_cache=true cache_valid_time=86400
+
+    - name: Update all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
+
+  roles:
+
+    # Set system timezone
+    - role: gantsign.timezone
+      timezone: Europe/London
+
+    # Set keyboard layout
+    - role: gantsign.keyboard
+      keyboard_model: '{{ kb_model }}'
+      keyboard_layout: '{{ kb_layout }}'
+
+    # Configure locale
+    - role: oefenweb.locales
+      locales_present:
+        - en_GB.UTF-8
+        - en_US.UTF-8
+      locales_default:
+        lang: '{{ locale }}'
+
+    # Install GNOME desktop
+    - role: gantsign.xdesktop
+      tags:
+        - gui
+
+    # Disable guest login
+    - role: gantsign.lightdm
+      tags:
+        - gui
+
+    # Install Browser
+    - role: browsers
+      tags:
+        - gui
+        - browser
+
+  post_tasks:
+    # Cleanup
+    - name: Remove dependencies that are no longer required
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Remove obsolete packages from the cache
+      ansible.builtin.apt:
+        autoclean: true

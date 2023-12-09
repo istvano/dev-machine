@@ -18,35 +18,7 @@
       ansible.builtin.apt:
         upgrade: dist
 
-    # zram shouldn't be used with Zswap
-    - name: Ensure zram-config absent
-      ansible.builtin.apt:
-        name: zram-config
-        state: absent
-
   roles:
-
-    # Set system timezone
-    - role: gantsign.timezone
-      timezone: Europe/London
-
-    # Increase the number of files that can be watched.
-    # https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
-    - role: gantsign.inotify
-      inotify_max_user_watches: 524288
-
-    # Set keyboard layout
-    - role: gantsign.keyboard
-      keyboard_model: '{{ kb_model }}'
-      keyboard_layout: '{{ kb_layout }}'
-
-    # Configure locale
-    - role: oefenweb.locales
-      locales_present:
-        - en_GB.UTF-8
-        - en_US.UTF-8
-      locales_default:
-        lang: '{{ locale }}'
 
     # Install common command line tools
     - role: cli_tools
@@ -202,27 +174,11 @@
         - name: ts-node
         - name: typings
 
-    # Install GNOME desktop
-    - role: gantsign.xdesktop
-      tags:
-        - gui
-
-    # Disable guest login
-    - role: gantsign.lightdm
-      tags:
-        - gui
-
     # Install Postman HTTP tool
     - role: postman
       tags:
         - gui
         - postman
-
-    # Install Browser
-    - role: browsers
-      tags:
-        - gui
-        - browser
 
     # Install Visual Studio Code editor
     - role: gantsign.visual-studio-code
