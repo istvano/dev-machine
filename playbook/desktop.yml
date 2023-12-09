@@ -53,6 +53,12 @@
         - gui
         - browser
 
+    # Install backup tools
+    - role: backup
+      tags:
+        - gui
+        - backup
+
   post_tasks:
     # Cleanup
     - name: Remove dependencies that are no longer required

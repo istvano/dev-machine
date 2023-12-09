@@ -1,0 +1,11 @@
+---
+- name: install backup tools
+  become: yes
+  apt:
+    name:
+      - smartmontools
+      - nvme-cli 
+      - clonezilla
+      - rsync
+      - timeshift
+    state: present
