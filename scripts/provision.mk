@@ -29,3 +29,7 @@ pro/without-snaps:  ##@provision Run ansible to setup machine without snaps
 .PHONY: pro/misc
 pro/misc:  ##@provision Run ansible to setup office and vm tools 
 	(cd playbook && ansible-playbook -v misc.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(VM_USER)")
+
+.PHONY: pro/security
+pro/security:  ##@provision Run ansible to setup machine's security
+	(cd playbook && ansible-playbook -v security.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(VM_USER)")

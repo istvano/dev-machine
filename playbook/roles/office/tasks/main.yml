@@ -15,4 +15,5 @@
       - obs-studio
       - okular
       - keepass2
+      - gnome-tweaks
     state: present
