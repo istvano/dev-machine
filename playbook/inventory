@@ -1,2 +1,8 @@
 [all]
 192.168.64.6  ansible_user=admin
+
+[terminal]
+192.168.64.6  ansible_user=admin
+
+[desktop]
+192.168.64.6  ansible_user=admin

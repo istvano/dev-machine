@@ -6,6 +6,7 @@
       - bat
       - btop
       - curl
+      - vim
       - dos2unix
       - duf
       - fd-find
@@ -32,4 +33,5 @@
       - wget
       - zoxide
       - ctop
+      - tilix
     state: present

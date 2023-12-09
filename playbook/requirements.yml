@@ -38,3 +38,7 @@
   version: 'v3.0.1'
 - src: https://github.com/gantsign/ansible-role-xdesktop/archive/6.1.1.tar.gz
   name: gantsign.xdesktop
+- src: andrewrothstein.starship
+  version: 'v1.1.5'
+- src: gantsign.postman
+  version: '2.4.0'

@@ -1,0 +1,127 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    locale: en_GB.UTF-8
+    my_user: admin
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt: update_cache=true cache_valid_time=86400
+
+    - name: Update all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
+
+  roles:
+
+     # sets up workspace
+    - role: workspace
+      become_user: '{{ my_user }}'
+      tags:
+         - work
+ 
+     # Configure Git version control
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        core.autocrlf: input # Force Linux line endings
+        diff.algorithm: histogram # For improved diff
+        diff.indentHeuristic: 'true' # For improved diff
+        diff.mnemonicPrefix: 'true' # For more readable diff
+        difftool.prompt: 'false' # Suppress annoying prompt launching difftool
+        init.defaultBranch: main
+        log.date: 'format:%a %Y-%m-%d %H:%M:%S %z' # Use ISO format
+        mergetool.prompt: 'false' # Suppress annoying prompt launching mergetool
+        push.autoSetupRemote: 'true' # So you can pull the branch later
+        push.default: simple # Use same branch names for local and remote
+        rerere.autoUpdate: 'true' # Avoid having to redo a merge
+        rerere.enabled: 'true' # Avoid having to redo a merge
+        user.useConfigOnly: 'true' # Don't guess username / email
+
+        # utility aliases
+        alias.rhead: >-
+          !git remote show origin | grep -Po 'HEAD branch: \K.*'
+        alias.root: 'rev-parse --show-toplevel'
+        alias.lb: >-
+          !git reflog show --pretty=format:'%gs ~ %gd' --date=relative
+          | grep 'checkout:'
+          | grep -oE '[^ ]+ ~ .*'
+          | awk -F~ '!seen[$1]++'
+          | head -n 10
+          | awk -F' ~ HEAD@{' '{printf("  \033[33m%s: \033[37m %s\033[0m\n", substr($2, 1, length($2)-1), $1)}'
+        alias.exec: '!f() { exec "$@"; }; f'
+        # log output
+        alias.lds: 'log --pretty=format:"%C(yellow)%h\ %ad%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate --date=short'
+        alias.ll: 'log --pretty=format:"%C(yellow)%h%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate --numstat'
+        alias.ls: 'log --pretty=format:"%C(yellow)%h%Cred%d\ %Creset%s%Cblue\ [%an]" --decorate'
+        alias.lt: 'log --oneline --graph --decorate --all'
+        alias.release-notes: >-
+          !git log --color --pretty=format:'%s%Cred%d%Creset' --decorate | sed -E 's/(.*) \((\#[0-9]+)\)/* \2: \1/' | tac -
+        # switching branch
+        alias.sw: 'switch'
+        alias.cb: 'switch -c'
+        alias.sdp: '!git switch $(git dev) && git pull -p'
+        alias.shp: '!git fetch -p && git switch $(git rhead) && git pull -p'
+        alias.smp: '!git switch $(git main) && git pull -p'
+        # amending commits
+        alias.ca: 'commit --amend'
+        alias.cane: 'commit --amend --no-edit'
+        # pushing
+        alias.po: 'push origin HEAD'
+        alias.pof: 'push origin HEAD --force'
+        # rebasing
+        alias.rod: '!git fetch -p && git rebase origin/$(git dev)'
+        alias.roh: '!git fetch -p && git rebase origin/$(git rhead)'
+        alias.rom: '!git fetch -p && git rebase origin/$(git main)'
+        # other
+        alias.pop: 'stash pop'
+
+    # Configure Git version control for Meld
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        difftool.meld.cmd: 'meld "$LOCAL" "$REMOTE"'
+        merge.tool: meld
+        mergetool.meld.cmd: 'meld "$LOCAL" "$MERGED" "$REMOTE"'
+      tags:
+        - gui
+
+    # Configure Git version control for VS Code
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        difftool.code.cmd: 'code --reuse-window --wait --diff "$LOCAL" "$REMOTE"'
+        mergetool.code.cmd: 'code --reuse-window --wait "$MERGED"'
+      tags:
+        - gui
+        - vscode
+
+    # Configure Git version control for IntelliJ
+    - role: git_config
+      become_user: '{{ my_user }}'
+      git_config:
+        difftool.idea.cmd: 'idea diff "$LOCAL" "$REMOTE"'
+        mergetool.idea.cmd: 'idea merge "$LOCAL" "$REMOTE" "$BASE" "$MERGED"'
+      tags:
+        - gui
+        - intellij
+
+    # Configure Git user name and email
+    - role: gantsign.git_user
+      users:
+        - username: '{{ my_user }}'
+          git_user_name: '{{ git_user_name | default(None) }}'
+          git_user_email: '{{ git_user_email | default(None) }}'
+          git_user_force: '{{ git_user_force | default(False) }}'
+
+  post_tasks:
+    # Cleanup
+    - name: Remove dependencies that are no longer required
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Remove obsolete packages from the cache
+      ansible.builtin.apt:
+        autoclean: true
