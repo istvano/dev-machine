@@ -1,0 +1,5 @@
+---
+- name: Creates workspace
+  ansible.builtin.file:
+    path: ~/workspace
+    state: directory

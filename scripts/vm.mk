@@ -16,6 +16,11 @@ vm/tart/start:  ##@vm Start Tart VM using tart
 	@echo "Starting vm using Tart..."
 	$(TART) run --dir=shared:$(SHARE) $(TART_VM_NAME)
 
+.PHONY: vm/tart/stop
+vm/tart/stop:  ##@vm Stop Tart VM using tart
+	@echo "Starting vm using Tart..."
+	$(TART) run --dir=shared:$(SHARE) $(TART_VM_NAME)
+
 .PHONY: vm/tart/delete
 vm/tart/delete:  ##@vm Delete Tart VM
 	@echo "deleting vm using Tart..."
