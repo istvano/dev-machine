@@ -10,6 +10,7 @@ export $(shell sed 's/=.*//' $(env))
 include ./scripts/help.mk
 include ./scripts/init.mk
 include ./scripts/vm.mk
+include ./scripts/local.mk
 include ./scripts/provision.mk
 include ./scripts/sec.mk
 
