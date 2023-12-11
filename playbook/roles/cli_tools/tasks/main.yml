@@ -34,4 +34,5 @@
       - zoxide
       - ctop
       - tilix
+      - p7zip-full
     state: present
