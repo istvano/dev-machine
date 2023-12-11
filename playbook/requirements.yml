@@ -6,7 +6,7 @@
 - src: geerlingguy.nodejs
   version: '6.1.1'
 - src: oefenweb.locales
-  version: 'v1.0.56'
+  version: 'v1.0.52'
 - src: gantsign.git_user
   version: '1.2.0'
 - src: gantsign.inotify
