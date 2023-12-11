@@ -3,8 +3,6 @@
   become: yes
   apt:
     name:
-      - smartmontools
-      - nvme-cli 
       - clonezilla
       - rsync
       - timeshift
