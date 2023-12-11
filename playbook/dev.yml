@@ -4,7 +4,7 @@
 
   vars:
     intellij_edition: community
-    intellij_license_key_path: /home/admin/license.txt
+    intellij_license_key_path:
     my_user: admin
     kb_model: pc105 
     kb_layout: gb
