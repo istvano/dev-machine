@@ -1,3 +1,4 @@
 share/*
 etc/*
 playbook/inventory
+.env
