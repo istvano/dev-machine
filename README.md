@@ -30,6 +30,12 @@ Wait for the machine to boot up
 * `make pro/snap` will run ansible and installs postman and other snap packages
 * `make pro/misc` will run ansible and provision multimedia and office apps
 
+### Params
+
+* LOCAL_ADDRESS the address of the machine for local provisioning, used to create inventory for local run
+* LOCAL_USER the user to connect to the local address
+* PRO_PARAMS any parameters for ansible e.g. -k (ssh password) -K (become password)
+
 ## Info
 
 Open the requirements.yml to find details about the external ansible roles
