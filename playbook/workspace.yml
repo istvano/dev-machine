@@ -5,6 +5,9 @@
   vars:
     locale: en_GB.UTF-8
     my_user: admin
+    git_user_name:
+    git_user_email:
+    git_user_force: false
 
   pre_tasks:
     - name: Update apt cache

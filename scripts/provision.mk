@@ -16,7 +16,7 @@ pro/dev:  ##@provision Run ansible to setup machine with dev tools
 
 .PHONY: pro/workspace
 pro/workspace:  ##@provision Run ansible to setup machine's workspace
-	(cd playbook && ansible-playbook -v workspace.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(VM_USER)" $(PRO_PARAMS))
+	(cd playbook && ansible-playbook -v workspace.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(VM_USER) git_user_name=$(GIT_USER) git_user_email=$(GIT_EMAIL) git_user_force=$(GIT_FORCE)" $(PRO_PARAMS))
 
 .PHONY: pro/snaps
 pro/snaps:  ##@provision Run ansible to setup machine with snaps
