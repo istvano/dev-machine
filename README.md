@@ -24,11 +24,12 @@ Wait for the machine to boot up
 * `make vm/tart/inventory` will create an ansible inventory file using the VM's ip
 * `make pro/install-reqs` will install ansible requirements
 * `make pro/init` set up required keys and repositories
-* `make pro/dekstop` will run ansible and provision the desktop 
-* `make pro/dev` will run ansible and provision the vm with dev tools
-* `make pro/workspace` will run ansible and provision dev workspace
-* `make pro/snap` will run ansible and installs postman and other snap packages
-* `make pro/misc` will run ansible and provision multimedia and office apps
+* `make pro/dekstop` will run ansible and provision the desktop if you are running a server version
+* `make pro/dev` will run ansible and provision the vm with dev tools python, vscode, intellij
+* `make pro/snaps` will run ansible and installs postman and other snap packages postman
+* `make pro/workspace` will run ansible and provision dev workspace e.g. gitconfig
+* `make pro/misc` will run ansible and provision multimedia and office, backup apps and browser
+* `make pro/security` will run ansible and enable firewall
 
 ### Params
 

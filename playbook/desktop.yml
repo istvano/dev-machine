@@ -3,7 +3,6 @@
   become: true
 
   vars:
-    intellij_edition: community
     my_user: admin
     kb_model: pc105 
     kb_layout: gb
@@ -45,18 +44,6 @@
     - role: gantsign.lightdm
       tags:
         - gui
-
-    # Install Browser
-    - role: browsers
-      tags:
-        - gui
-        - browser
-
-    # Install backup tools
-    - role: backup
-      tags:
-        - gui
-        - backup
 
   post_tasks:
     # Cleanup

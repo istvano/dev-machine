@@ -1,0 +1,12 @@
+---
+- name: install Office apps
+  become: yes
+  apt:
+    name:
+      - krita
+      - gimp
+      - flameshot
+      - obs-studio
+      - okular
+      - converseen
+    state: present

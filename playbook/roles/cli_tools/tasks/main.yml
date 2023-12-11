@@ -6,11 +6,11 @@
       - bat
       - btop
       - curl
-      - vim
       - dos2unix
       - duf
       - fd-find
       - fzf
+      - git
       - git-absorb
       - git-extras
       - glances
@@ -29,10 +29,12 @@
       - shfmt
       - ssh-tools
       - tree
+      - vim
       - vim-airline
       - wget
       - zoxide
       - ctop
       - tilix
       - p7zip-full
+      - mc
     state: present

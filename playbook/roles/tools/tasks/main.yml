@@ -1,0 +1,11 @@
+---
+- name: install tools
+  become: yes
+  apt:
+    name:
+      - copyq
+      - keepass2
+      - nvme-cli
+      - smartmontools
+      - gparted
+    state: present

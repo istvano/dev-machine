@@ -1,5 +1,5 @@
 ---
-- name: Install Postman
+- name: Install Starship
   ansible.builtin.snap:
     name: starship
     channel: latest/edge

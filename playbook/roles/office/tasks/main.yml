@@ -1,19 +1,8 @@
 ---
-- name: install Office apps
+- name: install office
   become: yes
   apt:
     name:
-      - vlc
       - ttf-mscorefonts-installer
       - libreoffice
-      - lollypop
-      - converseen
-      - krita
-      - copyq
-      - gimp
-      - flameshot
-      - obs-studio
-      - okular
-      - keepass2
-      - gnome-tweaks
     state: present

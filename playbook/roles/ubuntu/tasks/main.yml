@@ -1,0 +1,7 @@
+---
+- name: install ubuntu related packages
+  become: yes
+  apt:
+    name:
+      - ubuntu-restricted-extras
+    state: present

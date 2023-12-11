@@ -20,7 +20,43 @@
 
   roles:
 
-    # Install Office apps
+    # Install ubuntu tools
+    - role: ubuntu
+      tags:
+        - gui
+        - ubuntu
+
+    # Install backup tools
+    - role: backup
+      tags:
+        - gui
+        - backup
+
+    # Install tools
+    - role: tools
+      tags:
+        - gui
+        - office
+
+    # Install Browser
+    - role: browsers
+      tags:
+        - gui
+        - browser
+
+    # Install image edtiros etc
+    - role: graphic
+      tags:
+        - gui
+        - graphic
+
+    # Install music / audio
+    - role: multimedia
+      tags:
+        - gui
+        - multimedia
+
+    # Install music / audio
     - role: office
       tags:
         - gui

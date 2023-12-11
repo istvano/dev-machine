@@ -1,0 +1,9 @@
+---
+- name: install multimedia apps
+  become: yes
+  apt:
+    name:
+      - gnome-tweaks
+      - vlc
+      - lollypop
+    state: present

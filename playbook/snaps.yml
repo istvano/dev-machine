@@ -23,7 +23,7 @@
  
     - role: starship
       tags:
-         - oh-my-zsh
+         - terminal
          - gui
 
   post_tasks:
