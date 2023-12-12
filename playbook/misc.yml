@@ -56,11 +56,16 @@
         - gui
         - multimedia
 
-    # Install music / audio
+    # Install office
     - role: office
       tags:
         - gui
         - office
+
+    # Install fonts
+    - role: fonts
+      tags:
+        - fonts
 
     # Install vm tools
     # - role: vm

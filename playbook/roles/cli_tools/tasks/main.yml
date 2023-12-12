@@ -33,7 +33,6 @@
       - vim-airline
       - wget
       - zoxide
-      - ctop
       - tilix
       - p7zip-full
       - mc

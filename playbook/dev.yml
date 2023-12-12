@@ -68,19 +68,24 @@
       maven_version: '3.9.4'
 
     # Add Node.js
-    - role: geerlingguy.nodejs
+    - role: nodejs
       tags:
         - nodejs
-      nodejs_version: 18.x
-      nodejs_install_npm_user: '{{ my_user }}'
-      nodejs_npm_global_packages:
-        - name: grunt-cli
-        - name: grunt-init
-        - name: gulp-cli
-        - name: npm-check-updates
-        - name: typescript
-        - name: ts-node
-        - name: typings
+
+    # # Add Node.js
+    # - role: geerlingguy.nodejs
+    #   tags:
+    #     - nodejs
+    #   nodejs_version: 18.x
+    #   nodejs_install_npm_user: '{{ my_user }}'
+    #   nodejs_npm_global_packages:
+    #     - name: grunt-cli
+    #     - name: grunt-init
+    #     - name: gulp-cli
+    #     - name: npm-check-updates
+    #     - name: typescript
+    #     - name: ts-node
+    #     - name: typings
 
     # Install Visual Studio Code editor
     - role: gantsign.visual-studio-code
