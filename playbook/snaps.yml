@@ -26,6 +26,16 @@
          - terminal
          - gui
 
+    - role: drawio
+      tags:
+         - graphic
+         - gui
+
+    - role: slack
+      tags:
+         - com
+         - gui
+
   post_tasks:
     # Cleanup
     - name: Remove dependencies that are no longer required
