@@ -33,3 +33,7 @@ pro/misc:  ##@provision Run ansible to setup office and vm tools
 .PHONY: pro/security
 pro/security:  ##@provision Run ansible to setup machine's security
 	(cd playbook && ansible-playbook -v security.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(ANSIBLE_USER)" $(PRO_PARAMS))
+
+.PHONY: pro/test
+pro/test:
+	(cd playbook && ansible-playbook -v test.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(ANSIBLE_USER)" $(PRO_PARAMS))

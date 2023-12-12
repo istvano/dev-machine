@@ -4,8 +4,9 @@
   apt:
     name:
       - copyq
-      - keepass2
+      - keepassxc
       - nvme-cli
       - smartmontools
       - gparted
+      - meld
     state: present
