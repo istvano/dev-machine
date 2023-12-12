@@ -9,4 +9,7 @@
       - smartmontools
       - gparted
       - meld
+      - filezilla
+      - putty
+      - putty-tools
     state: present
