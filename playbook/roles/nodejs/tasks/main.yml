@@ -7,6 +7,16 @@
     chdir: "$HOME"
     creates: "$HOME/.nvm/nvm.sh"
 
+- name: add lines to zsh
+  blockinfile: 
+    state: present
+    insertbefore: "# Initialize modules."
+    dest: "$HOME/.zshrc"
+    marker: "# nvm ANSIBLE MANAGED BLOCK #"
+    content: |
+      export NVM_DIR=~/.nvm
+      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
 - name: Install node
   ansible.builtin.shell: >
     . ./.nvm/nvm.sh && nvm install {{ item }}

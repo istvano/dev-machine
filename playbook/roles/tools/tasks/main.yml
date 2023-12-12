@@ -8,4 +8,5 @@
       - nvme-cli
       - smartmontools
       - gparted
+      - meld
     state: present

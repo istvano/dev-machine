@@ -69,6 +69,8 @@
 
     # Add Node.js
     - role: nodejs
+      become: yes
+      become_user: '{{ my_user }}'
       tags:
         - nodejs
 
