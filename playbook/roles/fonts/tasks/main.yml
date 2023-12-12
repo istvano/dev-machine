@@ -1,0 +1,9 @@
+---
+- name: install great fonts
+  become: yes
+  apt:
+    name:
+      - fonts-roboto
+      - fonts-cascadia-code
+      - fonts-firacode
+    state: present

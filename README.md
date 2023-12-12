@@ -9,19 +9,45 @@ You need to install ssh, git, docker and ansible and sshpass
 
 Execute `make` to get a list of command you can do
 
-### Init
+### Install pre requisites
 
+* `sudo apt install ansible openssh-server make` installs ansible and ssh
+
+### Download the release
+
+* `cd ~ && mkdir setup && cd setup && wget https://github.com/istvano/dev-machine/archive/refs/tags/0.0.4.tar.gz`
+* `tar -xzvf 0.0.4.tar.gz`
+* `cd dev-machine-0.0.4`
+* `cp .env.sample .env`
 * `make dev-key/create` will create a developer x.509 key pair for ssh access
+
+### Init vm with tart
+
+if you use a vm like tart, you can create the vm with the following commands:
+
 * `make vm/tart/clone` will create an ubuntu vm
 * `make vm/tart/set` will change the vm settings using .env cpu and mem values
 * `make vm/tart/start` will start the vitual machine
 
-Wait for the machine to boot up
+Wait for the machine to boot up ...
 
-### Provision
+### Prepare provisioning with tart
+
+if you use a vm like tart, you can set up the vm and ansible inventory with the following commands:
 
 * `make vm/tart/install-public-key` will install the dev key onto the vm to easy ssh access
 * `make vm/tart/inventory` will create an ansible inventory file using the VM's ip
+
+### Use it with a local server instead of tart
+
+In case you are using this against a local machine, use the following commands to install your PK onto the machine
+and create an inventory file for localhost
+
+* `make local/install-public-key` Install public key for local machine
+* `make local/inventory` Create inventory file for local machine
+
+### run provisioning with ansible
+
 * `make pro/install-reqs` will install ansible requirements
 * `make pro/init` set up required keys and repositories
 * `make pro/dekstop` will run ansible and provision the desktop if you are running a server version
@@ -36,6 +62,9 @@ Wait for the machine to boot up
 * LOCAL_ADDRESS the address of the machine for local provisioning, used to create inventory for local run
 * LOCAL_USER the user to connect to the local address
 * PRO_PARAMS any parameters for ansible e.g. -k (ssh password) -K (become password)
+
+> Please note: if you running the provisioning against a server where you need sudo password, you can add
+> the -K to PRO_PARAMS in .env
 
 ## Info
 
