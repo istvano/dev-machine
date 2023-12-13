@@ -12,4 +12,5 @@
       - filezilla
       - putty
       - putty-tools
+      - grsync
     state: present
