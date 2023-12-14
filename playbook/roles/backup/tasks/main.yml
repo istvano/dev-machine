@@ -6,4 +6,5 @@
       - clonezilla
       - rsync
       - timeshift
+      - syncthing
     state: present
