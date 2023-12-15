@@ -4,6 +4,10 @@
 dev/rest/editor: ## Running hoppscotch
 	$(DOCKER) compose -f ./etc/hoppscotch/docker-compose.yml up
 
+.PHONY: dev/rest/migrate
+dev/rest/migrate: ## Running hoppscotch migration
+	$(DOCKER) exec -it hoppscotch-aio pnpx prisma migrate deploy
+
 .PHONY: dev/ufw/allow
 dev/ufw/allow: ## Allow hoppscotch proxy to localhost
 	@SUBNET=$(shell docker network inspect hoppscotch_default --format "{{(index .IPAM.Config 0).Subnet}}"); \
