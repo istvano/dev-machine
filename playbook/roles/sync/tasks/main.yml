@@ -1,0 +1,40 @@
+---
+- name: Add syncthing repository key
+  apt_key:
+    id: "{{syncthing_apt_key_id}}"
+    url: "{{syncthing_apt_key_url}}"
+    keyring: "{{syncthing_apt_key_path}}"
+
+- name: Add syncthing repository
+  apt_repository:
+    repo: "{{syncthing_apt_repository}}"
+
+- name: Install syncthing package
+  apt:
+    name: syncthing
+
+- name: Copy syncthing systemd service
+  copy:
+    src: "/usr/lib/systemd/user/syncthing.service"
+    dest: "/etc/systemd/system/syncthing.service"
+    remote_src: true
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Set syncthing user
+  lineinfile:
+    path: "/etc/systemd/system/syncthing.service"
+    line: "User={{syncthing_user}}"
+    regexp: "^User="
+    insertafter: "^\\[Service\\]$"
+
+- name: Reload systemctl
+  systemd:
+    daemon-reload: true
+
+- name: Start syncthing
+  service:
+    name: "syncthing"
+    state: "started"
+    enabled: true
