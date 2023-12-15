@@ -105,12 +105,13 @@
             - oderwat.indent-rainbow
             - streetsidesoftware.code-spell-checker
             - timonwong.shellcheck
-            - rebornix.Ruby
+            - 42Crunch.vscode-openapi
             - mdickin.markdown-shortcuts
             - davidanson.vscode-markdownlint
             - vscode-icons-team.vscode-icons
             - ms-vscode-remote.remote-containers
             - eamodio.gitlens
+            - ms-python.python
             - ms-cst-e.vscode-devskim
             - ms-kubernetes-tools.vscode-kubernetes-tools
             - ms-azuretools.vscode-docker
