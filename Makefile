@@ -13,6 +13,7 @@ include ./scripts/vm.mk
 include ./scripts/local.mk
 include ./scripts/provision.mk
 include ./scripts/sec.mk
+include ./scripts/dev.mk
 
 USERNAME=$(shell whoami)
 UID=$(shell id -u ${USERNAME})

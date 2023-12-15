@@ -15,26 +15,20 @@
 
   roles:
 
-     # Install Postman HTTP tool
-    - role: postman
-      tags:
-         - gui
-         - postman
- 
     - role: starship
       tags:
-         - terminal
-         - gui
+        - terminal
+        - gui
 
     - role: drawio
       tags:
-         - graphic
-         - gui
+        - graphic
+        - gui
 
     - role: slack
       tags:
-         - com
-         - gui
+        - com
+        - gui
 
   post_tasks:
     # Cleanup
