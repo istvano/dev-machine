@@ -38,3 +38,8 @@
     name: "syncthing"
     state: "started"
     enabled: true
+
+- name: Ufw allow synching
+  ufw:
+    rule: allow
+    name: syncthing
