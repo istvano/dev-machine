@@ -1,0 +1,32 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    locale: en_GB.UTF-8
+    my_user: admin
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt: update_cache=true cache_valid_time=86400
+
+    - name: Update all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
+
+  roles:
+
+    # Install Syncthing
+    - role: dbeaver
+      tags:
+        - db
+
+  post_tasks:
+    # Cleanup
+    - name: Remove dependencies that are no longer required
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Remove obsolete packages from the cache
+      ansible.builtin.apt:
+        autoclean: true

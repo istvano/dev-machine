@@ -1,0 +1,5 @@
+---
+dbeaver_apt_key_id: "98F5A7CC1ABE72AC3852A007D33A1BD725ED047D"
+dbeaver_apt_key_url: "https://dbeaver.io/debs/dbeaver.gpg.key"
+dbeaver_apt_key_path: "/etc/apt/keyrings/dbeaver-archive-keyring.gpg"
+dbeaver_apt_repository: "deb [signed-by={{dbeaver_apt_key_path}}] https://dbeaver.io/debs/dbeaver-ce /"

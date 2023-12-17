@@ -56,6 +56,7 @@ and create an inventory file for localhost
 * `make pro/workspace` will run ansible and provision dev workspace e.g. gitconfig
 * `make pro/misc` will run ansible and provision multimedia and office, backup apps and browser
 * `make pro/security` will run ansible and enable firewall
+* `make pro/sync` will run ansible and install syncthing
 
 ### Params
 

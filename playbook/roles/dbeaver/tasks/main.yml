@@ -1,0 +1,14 @@
+---
+- name: Add dbeaver repository key
+  apt_key:
+    id: "{{dbeaver_apt_key_id}}"
+    url: "{{dbeaver_apt_key_url}}"
+    keyring: "{{dbeaver_apt_key_path}}"
+
+- name: Add dbeaver repository
+  apt_repository:
+    repo: "{{dbeaver_apt_repository}}"
+
+- name: Install dbeaver package
+  apt:
+    name: dbeaver-ce

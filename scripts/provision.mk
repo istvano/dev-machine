@@ -38,6 +38,10 @@ pro/security:  ##@provision Run ansible to setup machine's security
 pro/sync:  ##@provision Run ansible to setup file syncing
 	(cd playbook && ansible-playbook -v sync.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(ANSIBLE_USER)" $(PRO_PARAMS))
 
+.PHONY: pro/db
+pro/db:  ##@provision Run ansible to setup db editors
+	(cd playbook && ansible-playbook -v db.yml --private-key=$(DEV_KEY) --extra-vars "my_user=$(ANSIBLE_USER)" $(PRO_PARAMS))
+
 
 .PHONY: pro/test
 pro/test:
