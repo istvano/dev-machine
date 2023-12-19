@@ -10,7 +10,6 @@
       - gparted
       - meld
       - filezilla
-      - putty
-      - putty-tools
+      - remmina
       - grsync
     state: present
