@@ -1,3 +1,4 @@
+export COLORTERM="${COLORTERM:-truecolor}"
 export PATH="$HOME/.local/bin:$PATH"
 
 export PAGER="less"
