@@ -123,6 +123,7 @@ vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
 		--root-password password:password \
 		--hostname dev-machine \
 		--network \
+		--size $(VM_DISK)G \
 		--run-command 'apt-get --allow-releaseinfo-change update' \
 		--run-command 'dpkg-reconfigure --frontend=noninteractive openssh-server' \
 		--run-command 'useradd -m -p "" -s /bin/bash debian || true ; adduser debian sudo' \
@@ -136,11 +137,6 @@ vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
 		--ssh-inject $(VM_USER):file:$(HOME)/.ssh/id_rsa.pub; \
 		sudo chown $(USERNAME):$(USERNAME) $(VM_IMAGE))
 
-#		--size $(VM_DISK)G
-#		--run-command "echo 'auto eth0' >> /etc/network/interfaces" \
-#		--run-command "echo 'allow-hotplug eth0' >> /etc/network/interfaces" \
-#		--run-command "echo 'iface eth0 inet dhcp' >> /etc/network/interfaces" \
-
 .PHONY: vm/virtlib/create-vm
 vm/virtlib/create-vm: ##@virtlib Create a vm
 	virt-install \
@@ -153,6 +149,7 @@ vm/virtlib/create-vm: ##@virtlib Create a vm
 		--network bridge:virbr0 \
 		--console pty,target_type=serial
 
+#		--network=default,model=virtio \
 #		--network=bridge=br0,model=virtio \
 
 .PHONY: vm/virtlib/delete
@@ -177,4 +174,4 @@ vm/virtlib/list: ##@virtlib List vms
 
 .PHONY: vm/virtlib/ip
 vm/virtlib/ip: ##@virtlib List vms
-	$(VIRSH) domifaddr $(VM_NAME)
+	@MAC="$(shell $(VIRSH) dumpxml $(VM_NAME) | grep 'mac address'| grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')"; arp -an | grep $$MAC | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'
