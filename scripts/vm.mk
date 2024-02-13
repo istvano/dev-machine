@@ -69,7 +69,7 @@ vm/virtlib/setup: ##@virtlib Set up libvirt
 .PHONY: vm/virtlib/grantpermission
 vm/virtlib/grantpermission: ##@virtlib Grant permission for virtlib to access files
 	sudo usermod -aG kvm $USER
-	sudo usermod -aG libvirt $USER
+	sudo usermod -aG libvirt $USERsudo usermod -aG libvirt-kvm $USER
 	sudo addgroup $(USERNAME) libvirt
 	sudo addgroup $(USERNAME) kvm
 
@@ -92,14 +92,16 @@ vm/virtlib/delete-bridge: ##@virtlib Create a network
 #	sudo ip address add dev br0 192.168.68.1/24
 #	sudo ip addr show br0
 
-.PHONY: vm/virtlib/create-net
-vm/virtlib/create-net: ##@virtlib Create a network
+.PHONY: vm/virtlib/create-bridge-net
+vm/virtlib/create-bridge-net: ##@virtlib Create a network
 	virsh net-define $(ETC)/br0.xml
 	virsh net-start br0
 	virsh net-autostart br0
 	virsh net-list --all
 #	virsh -c qemu:///session net-define # in case of session level
 
+# ufw https://www.cyberciti.biz/faq/kvm-forward-ports-to-guests-vm-with-ufw-on-linux/
+# see https://apiraino.github.io/qemu-bridge-networking/
 .PHONY: vm/virtlib/allow-bridge
 vm/virtlib/allow-bridge: ##@virtlib Allow bridge for qemu
 	sudo mkdir -p /etc/qemu
@@ -107,6 +109,7 @@ vm/virtlib/allow-bridge: ##@virtlib Allow bridge for qemu
 	echo "include /etc/qemu/${USER}.conf" | sudo tee --append /etc/qemu/bridge.conf
 	sudo chown root:${USER} /etc/qemu/${USER}.conf
 	sudo chmod 640 /etc/qemu/${USER}.conf
+	sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
 
 .PHONY: vm/virtlib/list-net
 vm/virtlib/list-net: ##@virtlib List a network
@@ -115,15 +118,28 @@ vm/virtlib/list-net: ##@virtlib List a network
 .PHONY: vm/virtlib/create-image
 vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
 	(cd $(TMP) && sudo virt-builder debian-12 \
-		-o debian-12.qcow2 \
+		-o $(VM_IMAGE) \
 		--format qcow2 \
 		--root-password password:password \
 		--hostname dev-machine \
-		--install "vim,htop,sudo,net-tools" \
-		--size $(VM_DISK)G \
-		--firstboot-command 'useradd -m -p "" $(VM_USER) ; \
-							adduser $(VM_USER) sudo ; echo -e "$(VM_CRED)" | passwd $(VM_USER)'; \
-							sudo chown $(USERNAME):$(USERNAME) *.qcow2)
+		--network \
+		--run-command 'apt-get --allow-releaseinfo-change update' \
+		--run-command 'dpkg-reconfigure --frontend=noninteractive openssh-server' \
+		--run-command 'useradd -m -p "" -s /bin/bash debian || true ; adduser debian sudo' \
+		--run-command 'useradd -m -p "" -s /bin/bash $(VM_USER) || true ; adduser $(VM_USER) sudo' \
+		--install 'vim,htop,sudo,net-tools,network-manager,snapd' \
+		--firstboot-command 'echo -e "$(VM_CRED)" | passwd $(VM_USER)'; \
+		sudo virt-sysprep -a $(VM_IMAGE) \
+		--run-command 'dpkg-reconfigure --frontend=noninteractive openssh-server' \
+		--edit '/etc/network/interfaces: s/ens2/enp1s0/' \
+		--ssh-inject debian:file:$(HOME)/.ssh/id_rsa.pub \
+		--ssh-inject $(VM_USER):file:$(HOME)/.ssh/id_rsa.pub; \
+		sudo chown $(USERNAME):$(USERNAME) $(VM_IMAGE))
+
+#		--size $(VM_DISK)G
+#		--run-command "echo 'auto eth0' >> /etc/network/interfaces" \
+#		--run-command "echo 'allow-hotplug eth0' >> /etc/network/interfaces" \
+#		--run-command "echo 'iface eth0 inet dhcp' >> /etc/network/interfaces" \
 
 .PHONY: vm/virtlib/create-vm
 vm/virtlib/create-vm: ##@virtlib Create a vm
@@ -132,9 +148,9 @@ vm/virtlib/create-vm: ##@virtlib Create a vm
 		--name $(VM_NAME) \
 		--ram $(VM_MEM) \
 		--vcpus $(VM_CPU) \
-		--disk path=$(TMP)/debian-12.qcow2,format=qcow2,cache=none --import \
+		--disk path=$(TMP)/$(VM_IMAGE),format=qcow2,cache=none --import \
 		--os-variant debian12 \
-		--network=default,model=virtio \
+		--network default
 		--console pty,target_type=serial
 
 #		--network=bridge=br0,model=virtio \
@@ -161,4 +177,4 @@ vm/virtlib/list: ##@virtlib List vms
 
 .PHONY: vm/virtlib/ip
 vm/virtlib/ip: ##@virtlib List vms
-	$(VIRSH) domifaddr br0
+	$(VIRSH) domifaddr $(VM_NAME)
