@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+  # The service that spins up all 3 services at once in one container
+  hoppscotch-aio:
+    container_name: hoppscotch-aio
+    image: hoppscotch/hoppscotch
+    env_file:
+      - ./.env
+    depends_on:
+      hoppscotch-db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+      - "3100:3100"
+      - "3170:3170"
+
+  hoppscotch-proxy:
+    container_name: hoppscotch-proxy
+    image: hoppscotch/proxyscotch
+    ports:
+      - "9159:9159"
+    extra_hosts:
+        host.docker.internal: host-gateway
+
+  hppscotch-mail:
+    container_name: hoppscotch-mail
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+
+  hoppscotch-db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    user: postgres
+    environment:
+      # The default user defined by the docker image
+      POSTGRES_USER: postgres
+      # NOTE: Please UPDATE THIS PASSWORD!
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hoppscotch
+    volumes:
+      - hoppscotch-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}'"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  hoppscotch-data:

@@ -73,6 +73,45 @@ vm/virtlib/grantpermission: ##@virtlib Grant permission for virtlib to access fi
 	sudo addgroup $(USERNAME) libvirt
 	sudo addgroup $(USERNAME) kvm
 
+.PHONY: vm/virtlib/create-bridge
+vm/virtlib/create-bridge: ##@virtlib Create a network
+	nmcli con add type bridge ifname br0
+	nmcli con add type bridge-slave ifname enp1s0 master br0 con-name br0-enp0s3
+	nmcli con up br0-enp0s3
+	nmcli connection show --active
+
+.PHONY: vm/virtlib/delete-bridge
+vm/virtlib/delete-bridge: ##@virtlib Create a network
+	nmcli -f bridge con delete br0-enp0s3
+	nmcli connection delete br0
+	nmcli connection show --active
+
+#	connection editor nm-connection-editor
+#	sudo ip link add br0 type bridge
+#	sudo ip link set enp1s0 master br0
+#	sudo ip address add dev br0 192.168.68.1/24
+#	sudo ip addr show br0
+
+.PHONY: vm/virtlib/create-net
+vm/virtlib/create-net: ##@virtlib Create a network
+	virsh net-define $(ETC)/br0.xml
+	virsh net-start br0
+	virsh net-autostart br0
+	virsh net-list --all
+#	virsh -c qemu:///session net-define # in case of session level
+
+.PHONY: vm/virtlib/allow-bridge
+vm/virtlib/allow-bridge: ##@virtlib Allow bridge for qemu
+	sudo mkdir -p /etc/qemu
+	echo 'allow all' | sudo tee /etc/qemu/${USER}.conf
+	echo "include /etc/qemu/${USER}.conf" | sudo tee --append /etc/qemu/bridge.conf
+	sudo chown root:${USER} /etc/qemu/${USER}.conf
+	sudo chmod 640 /etc/qemu/${USER}.conf
+
+.PHONY: vm/virtlib/list-net
+vm/virtlib/list-net: ##@virtlib List a network
+	virsh -c qemu:///session net-list
+
 .PHONY: vm/virtlib/create-image
 vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
 	(cd $(TMP) && sudo virt-builder debian-12 \
@@ -80,10 +119,11 @@ vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
 		--format qcow2 \
 		--root-password password:password \
 		--hostname dev-machine \
-		--install "vim,htop" \
+		--install "vim,htop,sudo,net-tools" \
 		--size $(VM_DISK)G \
-		--firstboot-command 'useradd -m -p "" $(VM_USER) ; echo -e "$(VM_CRED)" | passwd $(VM_USER)' && \
-		sudo chown $(USERNAME):$(USERNAME) *.qcow2)
+		--firstboot-command 'useradd -m -p "" $(VM_USER) ; \
+							adduser $(VM_USER) sudo ; echo -e "$(VM_CRED)" | passwd $(VM_USER)'; \
+							sudo chown $(USERNAME):$(USERNAME) *.qcow2)
 
 .PHONY: vm/virtlib/create-vm
 vm/virtlib/create-vm: ##@virtlib Create a vm
@@ -96,6 +136,8 @@ vm/virtlib/create-vm: ##@virtlib Create a vm
 		--os-variant debian12 \
 		--network=default,model=virtio \
 		--console pty,target_type=serial
+
+#		--network=bridge=br0,model=virtio \
 
 .PHONY: vm/virtlib/delete
 vm/virtlib/delete: ##@virtlib Delete the vm
@@ -119,4 +161,4 @@ vm/virtlib/list: ##@virtlib List vms
 
 .PHONY: vm/virtlib/ip
 vm/virtlib/ip: ##@virtlib List vms
-	$(VIRSH) domifaddr $(VM_NAME)
+	$(VIRSH) domifaddr br0
