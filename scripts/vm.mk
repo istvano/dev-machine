@@ -150,7 +150,7 @@ vm/virtlib/create-vm: ##@virtlib Create a vm
 		--vcpus $(VM_CPU) \
 		--disk path=$(TMP)/$(VM_IMAGE),format=qcow2,cache=none --import \
 		--os-variant debian12 \
-		--network default
+		--network bridge:virbr0 \
 		--console pty,target_type=serial
 
 #		--network=bridge=br0,model=virtio \
