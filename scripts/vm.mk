@@ -69,7 +69,7 @@ vm/virtlib/setup: ##@virtlib Set up libvirt
 .PHONY: vm/virtlib/grantpermission
 vm/virtlib/grantpermission: ##@virtlib Grant permission for virtlib to access files
 	sudo usermod -aG kvm $USER
-	sudo usermod -aG libvirt $USERsudo usermod -aG libvirt-kvm $USER
+	sudo usermod -aG libvirt $USER
 	sudo addgroup $(USERNAME) libvirt
 	sudo addgroup $(USERNAME) kvm
 
