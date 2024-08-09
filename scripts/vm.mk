@@ -31,6 +31,11 @@ vm/tart/ssh:  ##@vm SSH into the VM, you need to install public key
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
 	$(SSH) -i $(DEV_KEY) $(VM_USER)@$$VM_IP
 
+.PHONY: vm/tart/login
+vm/tart/login:  ##@vm Tart login into the VM, you need to install public key
+	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
+	printf "%s" "$(VM_CRED)" | $(TART) login $$VM_IP --username $(VM_USER) --password-stdin 
+
 .PHONY: vm/tart/mount
 vm/tart/mount:  ##@vm Mount volume
 	@VM_IP=$(shell $(TART) ip $(TART_VM_NAME)) ; \
