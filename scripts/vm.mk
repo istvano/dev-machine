@@ -56,32 +56,32 @@ vm/tart/install-public-key:  ##@tart Install public key
 	$(SSH) -o PubkeyAuthentication=no -o PreferredAuthentications=password $(VM_USER)@$$VM_IP sh -c "'cat >> .ssh/authorized_keys'" < $(DEV_KEY).pub
 
 
-.PHONY: vm/virtlib/install
-vm/virtlib/install: ##@virtlib Install dependencies kvm qemu and libvirt
+.PHONY: vm/libvirt/install
+vm/libvirt/install: ##@virtlib Install dependencies kvm qemu and libvirt
 	sudo apt -y install guestfs-tools bridge-utils cpu-checker libvirt-clients libvirt-daemon qemu qemu-kvm virt-manager
 
-.PHONY: vm/virtlib/setup
-vm/virtlib/setup: ##@virtlib Set up libvirt
+.PHONY: vm/libvirt/setup
+vm/libvirt/setup: ##@virtlib Set up libvirt
 	sudo systemctl enable --now libvirtd
 	sudo systemctl start libvirtd
 	sudo systemctl status libvirtd
 
-.PHONY: vm/virtlib/grantpermission
-vm/virtlib/grantpermission: ##@virtlib Grant permission for virtlib to access files
+.PHONY: vm/libvirt/grantpermission
+vm/libvirt/grantpermission: ##@virtlib Grant permission for virtlib to access files
 	sudo usermod -aG kvm $USER
 	sudo usermod -aG libvirt $USER
 	sudo addgroup $(USERNAME) libvirt
 	sudo addgroup $(USERNAME) kvm
 
-.PHONY: vm/virtlib/create-bridge
-vm/virtlib/create-bridge: ##@virtlib Create a network
+.PHONY: vm/libvirt/create-bridge
+vm/libvirt/create-bridge: ##@virtlib Create a network
 	nmcli con add type bridge ifname br0
 	nmcli con add type bridge-slave ifname enp1s0 master br0 con-name br0-enp0s3
 	nmcli con up br0-enp0s3
 	nmcli connection show --active
 
-.PHONY: vm/virtlib/delete-bridge
-vm/virtlib/delete-bridge: ##@virtlib Create a network
+.PHONY: vm/libvirt/delete-bridge
+vm/libvirt/delete-bridge: ##@virtlib Create a network
 	nmcli -f bridge con delete br0-enp0s3
 	nmcli connection delete br0
 	nmcli connection show --active
@@ -92,8 +92,8 @@ vm/virtlib/delete-bridge: ##@virtlib Create a network
 #	sudo ip address add dev br0 192.168.68.1/24
 #	sudo ip addr show br0
 
-.PHONY: vm/virtlib/create-bridge-net
-vm/virtlib/create-bridge-net: ##@virtlib Create a network
+.PHONY: vm/libvirt/create-bridge-net
+vm/libvirt/create-bridge-net: ##@virtlib Create a network
 	virsh net-define $(ETC)/br0.xml
 	virsh net-start br0
 	virsh net-autostart br0
@@ -102,8 +102,8 @@ vm/virtlib/create-bridge-net: ##@virtlib Create a network
 
 # ufw https://www.cyberciti.biz/faq/kvm-forward-ports-to-guests-vm-with-ufw-on-linux/
 # see https://apiraino.github.io/qemu-bridge-networking/
-.PHONY: vm/virtlib/allow-bridge
-vm/virtlib/allow-bridge: ##@virtlib Allow bridge for qemu
+.PHONY: vm/libvirt/allow-bridge
+vm/libvirt/allow-bridge: ##@virtlib Allow bridge for qemu
 	sudo mkdir -p /etc/qemu
 	echo 'allow all' | sudo tee /etc/qemu/${USER}.conf
 	echo "include /etc/qemu/${USER}.conf" | sudo tee --append /etc/qemu/bridge.conf
@@ -111,12 +111,12 @@ vm/virtlib/allow-bridge: ##@virtlib Allow bridge for qemu
 	sudo chmod 640 /etc/qemu/${USER}.conf
 	sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
 
-.PHONY: vm/virtlib/list-net
-vm/virtlib/list-net: ##@virtlib List a network
+.PHONY: vm/libvirt/list-net
+vm/libvirt/list-net: ##@virtlib List a network
 	virsh -c qemu:///session net-list
 
-.PHONY: vm/virtlib/create-image
-vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
+.PHONY: vm/libvirt/create-image
+vm/libvirt/create-image: ##@virtlib Create a vm image based on a template
 	(cd $(TMP) && sudo virt-builder debian-12 \
 		-o $(VM_IMAGE) \
 		--format qcow2 \
@@ -137,8 +137,8 @@ vm/virtlib/create-image: ##@virtlib Create a vm image based on a template
 		--ssh-inject $(VM_USER):file:$(HOME)/.ssh/id_rsa.pub; \
 		sudo chown $(USERNAME):$(USERNAME) $(VM_IMAGE))
 
-.PHONY: vm/virtlib/create-vm
-vm/virtlib/create-vm: ##@virtlib Create a vm
+.PHONY: vm/libvirt/create-vm
+vm/libvirt/create-vm: ##@virtlib Create a vm
 	virt-install \
 		--connect qemu:///session \
 		--name $(VM_NAME) \
@@ -152,26 +152,26 @@ vm/virtlib/create-vm: ##@virtlib Create a vm
 #		--network=default,model=virtio \
 #		--network=bridge=br0,model=virtio \
 
-.PHONY: vm/virtlib/delete
-vm/virtlib/delete: ##@virtlib Delete the vm
+.PHONY: vm/libvirt/delete
+vm/libvirt/delete: ##@virtlib Delete the vm
 	$(VIRSH) destroy $(VM_NAME)
 
-.PHONY: vm/virtlib/edit
-vm/virtlib/edit: ##@virtlib Delete the vm
+.PHONY: vm/libvirt/edit
+vm/libvirt/edit: ##@virtlib Delete the vm
 	$(VIRSH) edit $(VM_NAME)
 
-.PHONY: vm/virtlib/start
-vm/virtlib/start: ##@virtlib Start the vm
+.PHONY: vm/libvirt/start
+vm/libvirt/start: ##@virtlib Start the vm
 	$(VIRSH) start $(VM_NAME)
 
-.PHONY: vm/virtlib/stop
-vm/virtlib/stop: ##@virtlib Stop the vm
+.PHONY: vm/libvirt/stop
+vm/libvirt/stop: ##@virtlib Stop the vm
 	$(VIRSH) shutdown $(VM_NAME)
 
-.PHONY: vm/virtlib/list
-vm/virtlib/list: ##@virtlib List vms
+.PHONY: vm/libvirt/list
+vm/libvirt/list: ##@virtlib List vms
 	$(VIRSH) list --all
 
-.PHONY: vm/virtlib/ip
-vm/virtlib/ip: ##@virtlib List vms
+.PHONY: vm/libvirt/ip
+vm/libvirt/ip: ##@virtlib List vms
 	@MAC="$(shell $(VIRSH) dumpxml $(VM_NAME) | grep 'mac address'| grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')"; arp -an | grep $$MAC | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'
