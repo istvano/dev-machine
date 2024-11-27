@@ -1,5 +1,0 @@
----
-- name: Install Drawio
-  ansible.builtin.snap:
-    name: drawio
-    state: present

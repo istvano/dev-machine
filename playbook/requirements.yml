@@ -1,6 +1,6 @@
 ---
 - src: geerlingguy.docker
-  version: '7.0.2'
+  version: '7.4.2'
 - src: weareinteractive.environment
   version: '1.5.0'
 - src: geerlingguy.nodejs
@@ -12,13 +12,13 @@
 - src: gantsign.inotify
   version: '1.2.2'
 - src: gantsign.intellij
-  version: '6.14.3'
+  version: '6.16.4'
 - src: gantsign.intellij_jdks
   version: '2.0.1'
 - src: gantsign.intellij-plugins
   version: '3.1.1'
 - src: gantsign.java
-  version: '11.1.5'
+  version: '12.0.1'
 - src: gantsign.keyboard
   version: '1.5.0'
 - src: gantsign.maven
@@ -34,12 +34,12 @@
 - src: gantsign.visual-studio-code
   version: '7.0.0'
 - src: gantsign.visual-studio-code-extensions
-  version: '2.4.0'
+  version: '2.5.0'
 - src: gantsign.lightdm
   version: 'v3.0.1'
 - src: https://github.com/gantsign/ansible-role-xdesktop/archive/6.1.1.tar.gz
   name: gantsign.xdesktop
 - src: andrewrothstein.starship
-  version: 'v1.1.5'
+  version: 'v1.2.3'
 - src: gantsign.postman
   version: '2.4.0'

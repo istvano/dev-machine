@@ -1,5 +1,0 @@
----
-- name: Install Slack
-  ansible.builtin.snap:
-    name: slack
-    state: present

@@ -31,6 +31,13 @@ if you use a vm like tart, you can create the vm with the following commands:
 
 Wait for the machine to boot up ...
 
+Next step is to get ip addresses
+
+* `make vm/tart/ip-arp` to get IP with arp
+* `make vm/tart/ip` to get IP with the default resolver
+
+you need to be able to get the ip address of the vm before provisioning
+
 ### Prepare provisioning with tart
 
 if you use a vm like tart, you can set up the vm and ansible inventory with the following commands:
@@ -50,7 +57,7 @@ and create an inventory file for localhost
 
 * `make pro/install-reqs` will install ansible requirements
 * `make pro/init` set up required keys and repositories
-* `make pro/dekstop` will run ansible and provision the desktop if you are running a server version
+* `make pro/desktop` will run ansible and provision the desktop if you are running a server version
 * `make pro/dev` will run ansible and provision the vm with dev tools python, vscode, intellij
 * `make pro/snaps` will run ansible and installs postman and other snap packages postman
 * `make pro/workspace` will run ansible and provision dev workspace e.g. gitconfig
