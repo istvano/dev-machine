@@ -12,6 +12,20 @@ mkdir -p "$ZSH_CACHE_DIR/completions"
 # Load environment variables
 [[ -f ~/.config/zsh/env.zsh ]] && source ~/.config/zsh/env.zsh
 
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    export HOMEBREW_INSTALL_FROM_API=1
+
+    # If the initialization file does not exist, generate it and then source it
+    # Otherwise, source it
+    if [[ ! -f "$ZSH_CACHE_DIR/homebrew" ]]; then
+        /home/linuxbrew/.linuxbrew/bin/brew shellenv | tee "$ZSH_CACHE_DIR/homebrew" >/dev/null
+    fi
+    source "$ZSH_CACHE_DIR/homebrew"
+
+    # refresh $commands
+    rehash
+fi
+
 if (( $+commands[starship] )); then
     # If the initialization file does not exist, generate it and then source it
     # Otherwise, source it and regenerate in the background

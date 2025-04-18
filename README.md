@@ -73,6 +73,14 @@ and create an inventory file for localhost
 > Please note: if you running the provisioning against a server where you need sudo password, you can add
 > the -K to PRO_PARAMS in .env
 
+## Tart change disk image
+
+### MacOS
+    truncate -s 50g ~/.tart/vms/ubuntu-dev-machine/disk.img
+
+### inside the VM
+
+
 ## Info
 
 Open the requirements.yml to find details about the external ansible roles

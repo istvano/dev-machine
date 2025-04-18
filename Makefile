@@ -8,6 +8,7 @@ include $(env)
 export $(shell sed 's/=.*//' $(env))
 
 include ./scripts/help.mk
+include ./scripts/misc.mk
 include ./scripts/init.mk
 include ./scripts/vm.mk
 include ./scripts/local.mk

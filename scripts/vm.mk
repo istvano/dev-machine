@@ -1,3 +1,8 @@
+# see https://tart.run/integrations/vm-management/#registry-authorization
+.PHONY: vm/tart/registry/login
+vm/tart/registry/login:
+	$(TART) login ghcr.io
+
 .PHONY: vm/tart/init
 vm/tart/init:  vm/tart/clone vm/tart/set ##@vm Clone and set vm settings
 
@@ -8,8 +13,12 @@ vm/tart/clone: ##@vm Clone ubuntu
 
 .PHONY: vm/tart/set
 vm/tart/set: ##@vm Configure vm settings
-	$(TART) set $(TART_VM_NAME) --memory=$(VM_MEM) --cpu=$(VM_CPU)
+	$(TART) set $(TART_VM_NAME) --memory=$(VM_MEM) --cpu=$(VM_CPU) --disk-size=$(VM_DISK)
 	@echo "Tart vm config set up..."
+
+.PHONY: vm/tart/pull
+vm/tart/pull: ##@vm pull
+	$(TART) pull $(TART_VM)
 
 .PHONY: vm/tart/start
 vm/tart/start:  ##@vm Start Tart VM using tart
@@ -63,3 +72,9 @@ vm/tart/ip:  ##@vm get IP
 .PHONY: vm/tart/ip-arp
 vm/tart/ip-arp:  ##@vm get IP
 	$(TART) ip $(TART_VM_NAME) --resolver=arp
+
+.PHONY: vm/tart/disk/expand
+vm/tart/disk/expand:  ##@vm Increase disk image
+	@echo "deleting vm using Tart..."
+	truncate -s 50g ~/.tart/vms/$(TART_VM_NAME)/disk.img
+

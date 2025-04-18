@@ -1,5 +1,8 @@
 export PATH="$HOME/.local/bin:$PATH"
 
+# Workaround for https://github.com/starship/starship/issues/2176
+export LC_ALL='en_GB.UTF-8'
+
 export PAGER="less"
 
 # Disable Oh My Zsh auto-update

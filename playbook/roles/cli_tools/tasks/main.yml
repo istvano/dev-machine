@@ -4,6 +4,11 @@
   apt:
     name:
       - bat
+      - gh
+      - git-delta
+      - lsd
+      - sd
+      - yq
       - btop
       - curl
       - dos2unix

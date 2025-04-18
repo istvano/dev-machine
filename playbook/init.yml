@@ -10,6 +10,30 @@
         state: directory
         mode: 'u=rwx,go=rx'
 
+    - name: Add Google Linux key
+      become: true
+      ansible.builtin.get_url:
+        url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+        dest: '/etc/apt/keyrings/linux.google.asc'
+        mode: 'u=rw,go=r'
+        force: true
+      tags:
+        - gui
+        - chrome
+
+    - name: Add Google Chrome repo
+      become: true
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/linux.google.asc]
+          https://dl.google.com/linux/chrome/deb/ stable main
+        filename: google-chrome
+        update_cache: no
+      tags:
+        - gui
+        - chrome
+      register: chrome_repo
+
     - name: Add vscode key
       become: true
       ansible.builtin.get_url:
@@ -38,6 +62,6 @@
       become: true
       ansible.builtin.apt:
         update_cache: true
-      when: >        
+      when: >
         (chrome_repo is defined and chrome_repo.changed)
         or (vscode_repo is defined and vscode_repo.changed)

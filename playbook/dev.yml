@@ -155,32 +155,6 @@
             "explorer.confirmDelete": false
           }
 
-    # Install Python extension for Visual Studio Code editor
-    - role: gantsign.visual-studio-code-extensions
-      tags:
-        - gui
-        - vscode
-        - python
-      users:
-        - username: '{{ my_user }}'
-          visual_studio_code_extensions:
-            - ms-python.python
-            - ms-python.isort
-            - redhat.ansible
-            - wholroyd.jinja
-
-    # Install Visual Studio Code editor extensions relating to Docker
-    - role: gantsign.visual-studio-code-extensions
-      tags:
-        - gui
-        - vscode
-        - docker
-      users:
-        - username: '{{ my_user }}'
-          visual_studio_code_extensions:
-            - ms-azuretools.vscode-docker
-            - ms-vscode-remote.remote-containers
-
     # Install and configure IntelliJ IDEA IDE
     - role: gantsign.intellij
       tags:
